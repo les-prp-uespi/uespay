@@ -1,4 +1,5 @@
 import { Router } from "express";
+import type { Request, Response } from "express";
 
 import {
     consultarSaldo,
@@ -8,19 +9,18 @@ import {
 
 const router = Router();
 
-router.get("/:id/saldo", async (req, res) => {
+router.get("/:id/saldo", (req: Request<{ id: string }>, res: Response) => {
     try {
-        const saldo = await consultarSaldo(req.params.id);
+        const saldo = consultarSaldo(req.params.id);
 
         res.json({ saldo });
-    } catch (error: any) {
-        res.status(400).json({
-            error: error.message
-        });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Erro desconhecido";
+        res.status(400).json({ erro: message });
     }
 });
 
-router.post("/:id/recarga", async (req, res) => {
+router.post("/:id/recarga", async (req: Request<{ id: string }>, res: Response) => {
     try {
         const user = await adicionarSaldo(
             req.params.id,
@@ -28,14 +28,13 @@ router.post("/:id/recarga", async (req, res) => {
         );
 
         res.json(user);
-    } catch (error: any) {
-        res.status(400).json({
-            error: error.message
-        });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Erro desconhecido";
+        res.status(400).json({ erro: message });
     }
 });
 
-router.post("/:id/pagamento", async (req, res) => {
+router.post("/:id/pagamento", async (req: Request<{ id: string }>, res: Response) => {
     try {
         const user = await debitarSaldo(
             req.params.id,
@@ -43,10 +42,9 @@ router.post("/:id/pagamento", async (req, res) => {
         );
 
         res.json(user);
-    } catch (error: any) {
-        res.status(400).json({
-            error: error.message
-        });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Erro desconhecido";
+        res.status(400).json({ erro: message });
     }
 });
 
