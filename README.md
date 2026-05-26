@@ -11,9 +11,11 @@ O **UesPay** é uma plataforma digital desenvolvida para facilitar pagamentos de
 O MVP (Produto Mínimo Viável) tem como objetivo inicial permitir:
 
 - Consulta de saldo;
+- Atualização de saldo;
 - Histórico de transações;
 - Pagamento digital;
-- Leitura e geração de QR Code;
+- Transferência de valores;
+- Processamento de QR Code.
 
 ---
 
@@ -24,7 +26,10 @@ O MVP (Produto Mínimo Viável) tem como objetivo inicial permitir:
 
 ### Backend
 - TypeScript
-- Express
+- Express 
+- Node.js
+
+
 
 ### Blockchain
 - Hyperledger FireFly
