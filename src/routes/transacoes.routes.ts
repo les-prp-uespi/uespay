@@ -1,6 +1,6 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
-import { getHistorico, pagarRefeicao, transferir } from "../services/transacao.service";
+import { getHistorico, pagarRefeicao, transferir } from "../services/carteira.service";
 import { processarQRCode } from "../services/qrcode.service";
 
 const router = Router();
@@ -21,6 +21,16 @@ router.post("/processar-qrcode", async (req: Request, res: Response) => {
 
         if (!qrCodeData || !userId || !senha) {
             res.status(400).json({ erro: "qrCodeData, userId e senha são obrigatórios" });
+            return;
+        }
+
+        if (typeof qrCodeData !== "string") {
+            res.status(400).json({ erro: "qrCodeData deve ser uma string JSON" });
+            return;
+        }
+
+        if (typeof userId !== "string" || typeof senha !== "string") {
+            res.status(400).json({ erro: "userId e senha devem ser strings" });
             return;
         }
 
