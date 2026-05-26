@@ -23,7 +23,8 @@ O MVP (Produto Mínimo Viável) tem como objetivo inicial permitir:
 - Flutter
 
 ### Backend
-- TypeScrip
+- TypeScript
+- Express
 
 ### Blockchain
 - Hyperledger FireFly
