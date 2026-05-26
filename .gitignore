@@ -1,5 +1,11 @@
 node_modules
-# Keep environment variables out of version control
+dist
+
+# Variáveis de ambiente (use .env.example como referência)
 .env
 
-/src/generated/prisma
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
