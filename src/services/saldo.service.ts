@@ -2,7 +2,7 @@ import { users } from "../data/users";
 import { registrarTransacao } from "./firefly.service";
 
 export async function consultarSaldo(userId: string) {
-    const user = users.find(u => u.id === userId);
+    const user = await users.find((u: { id: string; }) => u.id === userId);
 
     if (!user) {
         throw new Error("Usuário não encontrado");
@@ -15,7 +15,7 @@ export async function adicionarSaldo(
     userId: string,
     valor: number
 ) {
-    const user = users.find(u => u.id === userId);
+    const user = await users.find((u: { id: string; }) => u.id === userId);
 
     if (!user) {
         throw new Error("Usuário não encontrado");
@@ -36,7 +36,7 @@ export async function debitarSaldo(
     userId: string,
     valor: number
 ) {
-    const user = users.find(u => u.id === userId);
+    const user = await users.find((u: { id: string; }) => u.id === userId);
 
     if (!user) {
         throw new Error("Usuário não encontrado");

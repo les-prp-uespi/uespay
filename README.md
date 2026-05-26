@@ -20,11 +20,10 @@ O MVP (Produto Mínimo Viável) tem como objetivo inicial permitir:
 ## Tecnologias Esperadas
 
 ### Frontend
-- React
+- Flutter
 
 ### Backend
-- Node.js
-- Express
+- TypeScrip
 
 ### Blockchain
 - Hyperledger FireFly
