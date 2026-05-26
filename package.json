@@ -4,7 +4,9 @@
   "description": "Sistema de carteira digital universitária para modernização do acesso e pagamento de serviços dentro da universidade, com foco inicial no Restaurante Universitário (RU) da UESPI.",
   "main": "src/server.ts",
   "scripts": {
-    "dev": "ts-node src/server.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "repository": {
     "type": "git",
