@@ -48,9 +48,10 @@ git clone https://github.com/les-prp-uespi/uespay.git
 cd uespay
 ```
 
-### 2. Instalar dependências
+### 2. Instalar dependências do backend
 
 ```bash
+cd backend
 npm install
 ```
 
@@ -61,6 +62,8 @@ Copie o arquivo de exemplo e ajuste se necessário:
 ```bash
 cp .env.example .env
 ```
+
+> Os comandos a seguir devem ser executados dentro da pasta `backend/`.
 
 As variáveis padrão já vêm configuradas para o ambiente local:
 
@@ -106,6 +109,8 @@ Exibe um relatório com os 10 usuários pré-cadastrados e seus saldos.
 
 ## Scripts disponíveis
 
+> Execute dentro da pasta `backend/`.
+
 | Comando | Descrição |
 |---------|-----------|
 | `npm run dev` | Inicia o servidor em modo desenvolvimento (hot-reload) |
@@ -145,24 +150,30 @@ Exibe um relatório com os 10 usuários pré-cadastrados e seus saldos.
 ## Estrutura do Projeto
 
 ```
-src/
-├── data/
-│   └── users.ts              # Dados simulados de usuários
-├── middlewares/
-│   └── error.middleware.ts    # Tratamento de erros global
-├── routes/
-│   ├── saldo.routes.ts        # Rotas de saldo e recarga
-│   ├── transacoes.routes.ts   # Rotas de transações e QR Code
-│   └── usuarios.routes.ts     # Rotas de cadastro/listagem
-├── services/
-│   ├── carteira.service.ts    # Lógica de negócio da carteira
-│   ├── firefly.service.ts     # Integração com Hyperledger FireFly
-│   └── qrcode.service.ts      # Processamento de QR Code
-├── types/
-│   └── index.ts               # Interfaces e tipos TypeScript
-├── utils/
-│   └── seed.ts                # Script de seed
-└── server.ts                  # Ponto de entrada da aplicação
+uespay/
+├── backend/                       # API Node.js + Express
+│   ├── src/
+│   │   ├── data/
+│   │   │   └── users.ts           # Dados simulados de usuários
+│   │   ├── middlewares/
+│   │   │   └── error.middleware.ts # Tratamento de erros global
+│   │   ├── routes/
+│   │   │   ├── saldo.routes.ts    # Rotas de saldo e recarga
+│   │   │   ├── transacoes.routes.ts # Rotas de transações e QR Code
+│   │   │   └── usuarios.routes.ts # Rotas de cadastro/listagem
+│   │   ├── services/
+│   │   │   ├── carteira.service.ts # Lógica de negócio da carteira
+│   │   │   ├── firefly.service.ts # Integração com Hyperledger FireFly
+│   │   │   └── qrcode.service.ts  # Processamento de QR Code
+│   │   ├── types/
+│   │   │   └── index.ts           # Interfaces e tipos TypeScript
+│   │   ├── utils/
+│   │   │   └── seed.ts            # Script de seed
+│   │   └── server.ts              # Ponto de entrada da aplicação
+│   ├── package.json
+│   └── tsconfig.json
+├── frontend/                      # App Flutter (em desenvolvimento)
+└── README.md
 ```
 
 ---
