@@ -106,7 +106,7 @@ class TelaInicial extends StatelessWidget {
                       },
 
                       child: const ConteudoCard(
-                        'Ver saldo',
+                        'Fazer Transferência',
                         Icons.account_balance_wallet,
                       ),
                     ),

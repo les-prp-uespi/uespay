@@ -34,7 +34,7 @@ class TelaSucessoPag extends StatelessWidget {
     size: 70.0, // Tamanho do ícone de check
   ),),
               ),
-              Container(
+              SizedBox(
                 height: 70,
                 width: 300,
               child: Card(
