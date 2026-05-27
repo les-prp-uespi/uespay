@@ -6,12 +6,16 @@ import transacoesRoutes from "./routes/transacoes.routes";
 import usuariosRoutes from "./routes/usuarios.routes";
 import { errorHandler } from "./middlewares/error.middleware";
 import { inicializarTokenPool } from "./services/firefly.service";
+import { setupSwagger } from "./swagger";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// Configuração do Swagger
+setupSwagger(app);
 
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/saldo", saldoRoutes);

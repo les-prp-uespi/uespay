@@ -28,6 +28,35 @@ function sanitizarUsuario(user: { id: string; nome: string; email: string; senha
 
 // ─── GET /api/usuarios ─────────────────────────────────────────
 
+/**
+ * @swagger
+ * /api/usuarios:
+ *   get:
+ *     summary: Lista todos os usuários
+ *     description: Retorna uma lista com todos os usuários cadastrados (sem as senhas).
+ *     tags: [Usuários]
+ *     responses:
+ *       200:
+ *         description: Lista de usuários
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 usuarios:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       nome:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                 total:
+ *                   type: integer
+ */
 router.get("/", (_req: Request, res: Response) => {
     const usuarios = listarUsuarios().map(sanitizarUsuario);
     res.json({ usuarios, total: usuarios.length });
@@ -35,6 +64,26 @@ router.get("/", (_req: Request, res: Response) => {
 
 // ─── GET /api/usuarios/:id ─────────────────────────────────────
 
+/**
+ * @swagger
+ * /api/usuarios/{id}:
+ *   get:
+ *     summary: Busca um usuário por ID
+ *     description: Retorna os dados de um usuário específico (sem a senha).
+ *     tags: [Usuários]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID do usuário
+ *     responses:
+ *       200:
+ *         description: Dados do usuário
+ *       404:
+ *         description: Usuário não encontrado
+ */
 router.get("/:id", (req: Request<{ id: string }>, res: Response) => {
     const usuario = buscarUsuarioPorId(req.params.id);
 
@@ -48,6 +97,38 @@ router.get("/:id", (req: Request<{ id: string }>, res: Response) => {
 
 // ─── POST /api/usuarios ────────────────────────────────────────
 
+/**
+ * @swagger
+ * /api/usuarios:
+ *   post:
+ *     summary: Cadastra um novo usuário
+ *     description: Cria um novo usuário com nome, e-mail e senha.
+ *     tags: [Usuários]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nome
+ *               - email
+ *               - senha
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               senha:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Usuário cadastrado com sucesso
+ *       400:
+ *         description: Erro de validação dos campos
+ *       409:
+ *         description: E-mail já cadastrado
+ */
 router.post("/", (req: Request, res: Response) => {
     const { nome, email, senha } = req.body;
 
