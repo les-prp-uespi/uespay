@@ -1,0 +1,11 @@
+node_modules
+dist
+
+# Variáveis de ambiente (use .env.example como referência)
+.env
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
