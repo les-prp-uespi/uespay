@@ -10,6 +10,7 @@
 export interface User {
     id: string;
     nome: string;
+    email: string;
     saldo: number;
     senha: string; // TODO: substituir por hash (bcrypt) antes de produção
 }
