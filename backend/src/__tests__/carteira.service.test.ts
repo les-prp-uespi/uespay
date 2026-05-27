@@ -7,7 +7,7 @@ let mockSaldoBlockchain = 0;
 // Mock do firefly.service para não depender do FireFly rodando
 vi.mock("../services/firefly.service", () => ({
     mintarTokens: vi.fn().mockImplementation(async (valor) => { mockSaldoBlockchain += valor; }),
-    transferirParaRU: vi.fn().mockImplementation(async (valor) => { mockSaldoBlockchain -= valor; }),
+    transferirTokens: vi.fn().mockImplementation(async (valor) => { mockSaldoBlockchain -= valor; }),
     registrarTransferencia: vi.fn().mockImplementation(async (data) => { mockSaldoBlockchain -= data.valor; }),
     consultarSaldoBlockchain: vi.fn().mockImplementation(async () => mockSaldoBlockchain)
 }));
@@ -15,12 +15,12 @@ vi.mock("../services/firefly.service", () => ({
 import {
     consultarSaldo,
     adicionarSaldo,
-    debitarSaldo,
     pagarRefeicao,
     transferir,
     getHistorico,
     resetarTransacoes
 } from "../services/carteira.service";
+import { transferirTokens } from "../services/firefly.service";
 
 describe("Carteira Service", () => {
     beforeEach(() => {
@@ -72,26 +72,6 @@ describe("Carteira Service", () => {
             expect(historico).toHaveLength(1);
             expect(historico[0].tipo).toBe("RECARGA");
             expect(historico[0].valor).toBe(100);
-        });
-    });
-
-    // ─── Débito (debitarSaldo) ─────────────────────────────────
-
-    describe("debitarSaldo", () => {
-        it("deve decrementar o saldo do usuário", async () => {
-            // Primeiro adiciona saldo para poder debitar
-            await adicionarSaldo("1", 100);
-            const resultado = await debitarSaldo("1", 30);
-
-            expect(resultado.saldoRestante).toBe(70);
-        });
-
-        it("deve rejeitar quando saldo insuficiente", async () => {
-            await expect(debitarSaldo("1", 50)).rejects.toThrow("Saldo insuficiente");
-        });
-
-        it("deve rejeitar valor negativo", async () => {
-            await expect(debitarSaldo("1", -5)).rejects.toThrow("positivo");
         });
     });
 

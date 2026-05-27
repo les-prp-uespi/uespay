@@ -142,7 +142,7 @@ export async function mintarTokens(valor: number): Promise<void> {
  * Os tokens saem da chave do nó e vão para o endereço do RU,
  * registrando o pagamento na blockchain.
  */
-export async function transferirParaRU(valor: number): Promise<void> {
+export async function transferirTokens(valor: number): Promise<void> {
     try {
         await firefly.transferTokens({
             pool: TOKEN_POOL,

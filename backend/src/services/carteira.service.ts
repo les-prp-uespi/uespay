@@ -1,7 +1,7 @@
 import { buscarUsuarioPorId } from "../data/users";
 import {
     mintarTokens,
-    transferirParaRU,
+    transferirTokens,
     registrarTransferencia,
     consultarSaldoBlockchain
 } from "./firefly.service";
@@ -82,45 +82,6 @@ export async function adicionarSaldo(
     };
 }
 
-/**
- * Debita um valor do saldo de um usuário (pagamento genérico).
- * Transfere tokens para o RU no blockchain.
- */
-export async function debitarSaldo(
-    userId: string,
-    valor: number
-): Promise<RespostaTransacao> {
-    buscarUsuario(userId);
-
-    if (valor <= 0) {
-        throw new Error("Valor de pagamento deve ser positivo");
-    }
-
-    const saldoAtual = await consultarSaldoBlockchain();
-    if (saldoAtual < valor) {
-        throw new Error("Saldo insuficiente");
-    }
-
-    await transferirParaRU(valor);
-
-    const saldoFinal = await consultarSaldoBlockchain();
-
-    const transacao: Transacao = {
-        id: Date.now().toString(),
-        tipo: "PAGAMENTO",
-        fromUserId: userId,
-        valor,
-        data: new Date(),
-        descricao: "Pagamento de serviço"
-    };
-
-    transacoes.push(transacao);
-
-    return {
-        mensagem: "Pagamento realizado com sucesso!",
-        saldoRestante: saldoFinal
-    };
-}
 
 /**
  * Processa o pagamento de uma refeição no RU.
@@ -139,7 +100,7 @@ export async function pagarRefeicao(
     const saldoAtual = await consultarSaldoBlockchain();
     if (saldoAtual < valor) throw new Error("Saldo insuficiente");
 
-    await transferirParaRU(valor);
+    await transferirTokens(valor);
 
     const saldoFinal = await consultarSaldoBlockchain();
 
