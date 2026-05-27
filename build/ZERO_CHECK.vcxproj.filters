@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\julia\OneDrive\Área de Trabalho\uespay\build\CMakeFiles\4f6ebc54254941883f832006c98d8d48\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{9BE2E14C-4021-376B-93ED-163846D9CBA1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

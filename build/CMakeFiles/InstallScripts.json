@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/julia/OneDrive/\u00c1rea de Trabalho/uespay/build/cmake_install.cmake",
+		"C:/Users/julia/OneDrive/\u00c1rea de Trabalho/uespay/build/flutter/cmake_install.cmake",
+		"C:/Users/julia/OneDrive/\u00c1rea de Trabalho/uespay/build/runner/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

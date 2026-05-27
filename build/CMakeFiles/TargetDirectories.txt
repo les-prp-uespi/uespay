@@ -1,0 +1,10 @@
+C:/Users/julia/OneDrive/Área de Trabalho/uespay/build/CMakeFiles/INSTALL.dir
+C:/Users/julia/OneDrive/Área de Trabalho/uespay/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/julia/OneDrive/Área de Trabalho/uespay/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/julia/OneDrive/Área de Trabalho/uespay/build/flutter/CMakeFiles/flutter_wrapper_plugin.dir
+C:/Users/julia/OneDrive/Área de Trabalho/uespay/build/flutter/CMakeFiles/flutter_wrapper_app.dir
+C:/Users/julia/OneDrive/Área de Trabalho/uespay/build/flutter/CMakeFiles/flutter_assemble.dir
+C:/Users/julia/OneDrive/Área de Trabalho/uespay/build/flutter/CMakeFiles/INSTALL.dir
+C:/Users/julia/OneDrive/Área de Trabalho/uespay/build/runner/CMakeFiles/app_uespay.dir
+C:/Users/julia/OneDrive/Área de Trabalho/uespay/build/runner/CMakeFiles/INSTALL.dir
+C:/Users/julia/OneDrive/Área de Trabalho/uespay/build/runner/CMakeFiles/ALL_BUILD.dir
