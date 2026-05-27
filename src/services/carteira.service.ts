@@ -1,5 +1,5 @@
 import { users } from "../data/users";
-import { registrarTransacao } from "./firefly.service";
+import { mintarTokens, transferirParaRU, registrarTransferencia } from "./firefly.service";
 import type { Transacao, RespostaTransacao } from "../types";
 
 /** Armazena o histórico de transações em memória (mock). */
@@ -28,7 +28,7 @@ export function getHistorico(userId: string): Transacao[] {
 
 /**
  * Adiciona créditos ao saldo de um usuário (recarga).
- * Registra a operação no histórico e no FireFly.
+ * Emite (mint) tokens no blockchain para representar os novos créditos.
  */
 export async function adicionarSaldo(
     userId: string,
@@ -52,11 +52,7 @@ export async function adicionarSaldo(
     };
 
     transacoes.push(transacao);
-    await registrarTransacao({
-        tipo: "RECARGA",
-        userId,
-        valor
-    });
+    await mintarTokens(valor);
 
     return {
         mensagem: "Recarga realizada com sucesso!",
@@ -65,8 +61,8 @@ export async function adicionarSaldo(
 }
 
 /**
- * Debita um valor do saldo de um usuário (pagamento genérico pela rota de saldo).
- * Registra a operação no histórico e no FireFly.
+ * Debita um valor do saldo de um usuário (pagamento genérico).
+ * Transfere tokens para o serviço correspondente no blockchain.
  */
 export async function debitarSaldo(
     userId: string,
@@ -94,11 +90,7 @@ export async function debitarSaldo(
     };
 
     transacoes.push(transacao);
-    await registrarTransacao({
-        tipo: "PAGAMENTO",
-        userId,
-        valor
-    });
+    await transferirParaRU(valor);
 
     return {
         mensagem: "Pagamento realizado com sucesso!",
@@ -116,7 +108,7 @@ export function consultarSaldo(userId: string): number {
 
 /**
  * Processa o pagamento de uma refeição no RU.
- * Valida senha e saldo antes de debitar.
+ * Transfere tokens para o endereço do RU no blockchain.
  */
 export async function pagarRefeicao(
     userId: string,
@@ -137,15 +129,11 @@ export async function pagarRefeicao(
         fromUserId: userId,
         valor,
         data: new Date(),
-        descricao: "Pagamento de refeição"
+        descricao: "Pagamento de refeição no RU"
     };
 
     transacoes.push(transacao);
-    await registrarTransacao({
-        tipo: "REFEICAO",
-        fromUserId: userId,
-        valor
-    });
+    await transferirParaRU(valor);
 
     return {
         mensagem: "Pagamento realizado com sucesso!",
@@ -155,7 +143,7 @@ export async function pagarRefeicao(
 
 /**
  * Realiza uma transferência entre dois usuários.
- * Valida senha, saldo e existência dos dois usuários.
+ * Registra via broadcast no blockchain (ambos no mesmo nó no MVP).
  */
 export async function transferir(
     fromUserId: string,
@@ -184,7 +172,7 @@ export async function transferir(
     };
 
     transacoes.push(transacao);
-    await registrarTransacao({
+    await registrarTransferencia({
         tipo: "TRANSFERENCIA",
         fromUserId,
         toUserId,
