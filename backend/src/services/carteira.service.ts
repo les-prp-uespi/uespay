@@ -6,6 +6,13 @@ import type { Transacao, RespostaTransacao } from "../types";
 const transacoes: Transacao[] = [];
 
 /**
+ * Limpa o histórico de transações em memória (útil para testes).
+ */
+export function resetarTransacoes() {
+    transacoes.length = 0;
+}
+
+/**
  * Busca um usuário pelo ID.
  * Lança erro se não encontrado.
  */
