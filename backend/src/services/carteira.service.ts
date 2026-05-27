@@ -1,5 +1,10 @@
 import { buscarUsuarioPorId } from "../data/users";
-import { mintarTokens, transferirParaRU, registrarTransferencia } from "./firefly.service";
+import {
+    mintarTokens,
+    transferirParaRU,
+    registrarTransferencia,
+    consultarSaldoBlockchain
+} from "./firefly.service";
 import type { Transacao, RespostaTransacao } from "../types";
 
 /** Armazena o histórico de transações em memória (mock). */
@@ -34,6 +39,15 @@ export function getHistorico(userId: string): Transacao[] {
 }
 
 /**
+ * Consulta o saldo atual de um usuário.
+ * O saldo é obtido diretamente da blockchain (FireFly).
+ */
+export async function consultarSaldo(userId: string): Promise<number> {
+    buscarUsuario(userId);
+    return await consultarSaldoBlockchain();
+}
+
+/**
  * Adiciona créditos ao saldo de um usuário (recarga).
  * Emite (mint) tokens no blockchain para representar os novos créditos.
  */
@@ -41,13 +55,15 @@ export async function adicionarSaldo(
     userId: string,
     valor: number
 ): Promise<RespostaTransacao> {
-    const user = buscarUsuario(userId);
+    buscarUsuario(userId);
 
     if (valor <= 0) {
         throw new Error("Valor de recarga deve ser positivo");
     }
 
-    user.saldo += valor;
+    await mintarTokens(valor);
+
+    const saldoAtual = await consultarSaldoBlockchain();
 
     const transacao: Transacao = {
         id: Date.now().toString(),
@@ -59,33 +75,35 @@ export async function adicionarSaldo(
     };
 
     transacoes.push(transacao);
-    await mintarTokens(valor);
 
     return {
         mensagem: "Recarga realizada com sucesso!",
-        saldoRestante: user.saldo
+        saldoRestante: saldoAtual
     };
 }
 
 /**
  * Debita um valor do saldo de um usuário (pagamento genérico).
- * Transfere tokens para o serviço correspondente no blockchain.
+ * Transfere tokens para o RU no blockchain.
  */
 export async function debitarSaldo(
     userId: string,
     valor: number
 ): Promise<RespostaTransacao> {
-    const user = buscarUsuario(userId);
+    buscarUsuario(userId);
 
     if (valor <= 0) {
         throw new Error("Valor de pagamento deve ser positivo");
     }
 
-    if (user.saldo < valor) {
+    const saldoAtual = await consultarSaldoBlockchain();
+    if (saldoAtual < valor) {
         throw new Error("Saldo insuficiente");
     }
 
-    user.saldo -= valor;
+    await transferirParaRU(valor);
+
+    const saldoFinal = await consultarSaldoBlockchain();
 
     const transacao: Transacao = {
         id: Date.now().toString(),
@@ -97,20 +115,11 @@ export async function debitarSaldo(
     };
 
     transacoes.push(transacao);
-    await transferirParaRU(valor);
 
     return {
         mensagem: "Pagamento realizado com sucesso!",
-        saldoRestante: user.saldo
+        saldoRestante: saldoFinal
     };
-}
-
-/**
- * Consulta o saldo atual de um usuário.
- */
-export function consultarSaldo(userId: string): number {
-    const user = buscarUsuario(userId);
-    return user.saldo;
 }
 
 /**
@@ -126,9 +135,13 @@ export async function pagarRefeicao(
 
     if (user.senha !== senha) throw new Error("Senha inválida");
     if (valor <= 0) throw new Error("Valor deve ser positivo");
-    if (user.saldo < valor) throw new Error("Saldo insuficiente");
 
-    user.saldo -= valor;
+    const saldoAtual = await consultarSaldoBlockchain();
+    if (saldoAtual < valor) throw new Error("Saldo insuficiente");
+
+    await transferirParaRU(valor);
+
+    const saldoFinal = await consultarSaldoBlockchain();
 
     const transacao: Transacao = {
         id: Date.now().toString(),
@@ -140,17 +153,19 @@ export async function pagarRefeicao(
     };
 
     transacoes.push(transacao);
-    await transferirParaRU(valor);
 
     return {
         mensagem: "Pagamento realizado com sucesso!",
-        saldoRestante: user.saldo
+        saldoRestante: saldoFinal
     };
 }
 
 /**
  * Realiza uma transferência entre dois usuários.
  * Registra via broadcast no blockchain (ambos no mesmo nó no MVP).
+ *
+ * Nota: no MVP com 1 usuário, esta função não será usada no fluxo
+ * principal, mas está preparada para expansão.
  */
 export async function transferir(
     fromUserId: string,
@@ -159,14 +174,22 @@ export async function transferir(
     senha: string
 ): Promise<RespostaTransacao> {
     const remetente = buscarUsuario(fromUserId);
-    const destinatario = buscarUsuario(toUserId);
+    buscarUsuario(toUserId);
 
     if (remetente.senha !== senha) throw new Error("Senha inválida");
     if (valor <= 0) throw new Error("Valor deve ser positivo");
-    if (remetente.saldo < valor) throw new Error("Saldo insuficiente");
 
-    remetente.saldo -= valor;
-    destinatario.saldo += valor;
+    const saldoAtual = await consultarSaldoBlockchain();
+    if (saldoAtual < valor) throw new Error("Saldo insuficiente");
+
+    await registrarTransferencia({
+        tipo: "TRANSFERENCIA",
+        fromUserId,
+        toUserId,
+        valor
+    });
+
+    const saldoFinal = await consultarSaldoBlockchain();
 
     const transacao: Transacao = {
         id: Date.now().toString(),
@@ -175,19 +198,13 @@ export async function transferir(
         toUserId,
         valor,
         data: new Date(),
-        descricao: `Transferência para ${destinatario.nome}`
+        descricao: `Transferência para usuário ${toUserId}`
     };
 
     transacoes.push(transacao);
-    await registrarTransferencia({
-        tipo: "TRANSFERENCIA",
-        fromUserId,
-        toUserId,
-        valor
-    });
 
     return {
         mensagem: "Transferência realizada com sucesso!",
-        saldoRestante: remetente.saldo
+        saldoRestante: saldoFinal
     };
 }

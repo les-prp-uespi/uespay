@@ -28,6 +28,11 @@ function escalar(valor: number): string {
     return (BigInt(Math.round(valor)) * ESCALA).toString();
 }
 
+/** Converte valor em escala ERC-20 de volta para número legível. */
+function desescalar(valorEscalado: string): number {
+    return Number(BigInt(valorEscalado) / ESCALA);
+}
+
 /**
  * Inicializa o Token Pool no FireFly se ainda não existir.
  * Deve ser chamado uma vez na inicialização do servidor.
@@ -54,6 +59,44 @@ export async function inicializarTokenPool(): Promise<void> {
 }
 
 /**
+ * Consulta o saldo real de tokens na blockchain.
+ * Retorna o valor em créditos UesPay (já desescalado de 18 decimais).
+ * Lança erro se o FireFly estiver offline.
+ */
+export async function consultarSaldoBlockchain(): Promise<number> {
+    try {
+        // Primeiro precisamos do UUID do pool, pois getTokenBalances usa UUID
+        const pools = await firefly.getTokenPools();
+        const poolId = pools.find(p => p.name === TOKEN_POOL)?.id;
+
+        if (!poolId) {
+            return 0; // Pool não existe ainda
+        }
+
+        const balances = await firefly.getTokenBalances({ pool: poolId });
+
+        if (!balances || balances.length === 0) {
+            return 0;
+        }
+
+        // Filtra o saldo da chave default do nó (exclui endereço do RU)
+        const saldoAluno = balances.find(
+            (b) => b.key && b.key !== ENDERECO_RU
+        );
+
+        if (!saldoAluno || !saldoAluno.balance) {
+            return 0;
+        }
+
+        return desescalar(saldoAluno.balance);
+    } catch (error) {
+        throw new Error(
+            "Não foi possível consultar saldo: FireFly está offline. Inicie o FireFly com 'ff start uespay'."
+        );
+    }
+}
+
+/**
  * Emite (mint) novos tokens para representar uma recarga de créditos.
  * Representa a universidade emitindo créditos para o aluno.
  */
@@ -62,9 +105,11 @@ export async function mintarTokens(valor: number): Promise<void> {
         await firefly.mintTokens({
             pool: TOKEN_POOL,
             amount: escalar(valor)
-        });
+        }, { confirm: true });
     } catch (error) {
-        console.error("[FireFly] Erro ao mintar tokens:", error);
+        throw new Error(
+            "Não foi possível realizar recarga: FireFly está offline. Inicie o FireFly com 'ff start uespay'."
+        );
     }
 }
 
@@ -79,9 +124,11 @@ export async function transferirParaRU(valor: number): Promise<void> {
             pool: TOKEN_POOL,
             amount: escalar(valor),
             to: ENDERECO_RU
-        });
+        }, { confirm: true });
     } catch (error) {
-        console.error("[FireFly] Erro ao transferir tokens para o RU:", error);
+        throw new Error(
+            "Não foi possível realizar pagamento: FireFly está offline. Inicie o FireFly com 'ff start uespay'."
+        );
     }
 }
 
@@ -101,8 +148,10 @@ export async function registrarTransferencia(data: FireFlyPayload): Promise<void
                     value: data
                 }
             ]
-        });
+        }, { confirm: true });
     } catch (error) {
-        console.error("[FireFly] Erro ao registrar transferência:", error);
+        throw new Error(
+            "Não foi possível registrar transferência: FireFly está offline. Inicie o FireFly com 'ff start uespay'."
+        );
     }
 }
