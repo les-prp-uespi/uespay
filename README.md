@@ -180,7 +180,7 @@ uespay/
 
 ## Arquitetura da Solução
 <p align="center">
-  <img src="img/arquitetura.png" alt="Arquitetura da Solução">
+  <img src="img/arquitetura_projeto.png" alt="Arquitetura da Solução">
 </p>
 
 ## Equipe
