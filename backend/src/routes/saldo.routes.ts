@@ -4,9 +4,13 @@ import { consultarSaldo, adicionarSaldo, debitarSaldo } from "../services/cartei
 
 const router = Router();
 
-router.get("/:id/saldo", (req: Request<{ id: string }>, res: Response) => {
-    const saldo = consultarSaldo(req.params.id);
-    res.json({ saldo });
+router.get("/:id/saldo", async (req: Request<{ id: string }>, res: Response) => {
+    try {
+        const saldo = await consultarSaldo(req.params.id);
+        res.json({ saldo });
+    } catch (error) {
+        res.status(400).json({ erro: error instanceof Error ? error.message : String(error) });
+    }
 });
 
 router.post("/:id/recarga", async (req: Request<{ id: string }>, res: Response) => {

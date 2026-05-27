@@ -9,6 +9,7 @@
 
 import "dotenv/config";
 import { resetarUsuarios, listarUsuarios } from "../data/users";
+import { consultarSaldo } from "../services/carteira.service";
 
 // ─── Constantes de formatação ──────────────────────────────────
 
@@ -21,7 +22,7 @@ function formatarMoeda(valor: number): string {
 
 // ─── Execução ──────────────────────────────────────────────────
 
-function executarSeed(): void {
+async function executarSeed(): Promise<void> {
     console.log();
     console.log(SEPARADOR);
     console.log("  🎓  UesPay — Seed de Usuários e Carteiras");
@@ -46,13 +47,23 @@ function executarSeed(): void {
     console.log(LINHA);
 
     let saldoTotal = 0;
+    let semSaldo = 0;
 
     for (const user of usuarios) {
-        saldoTotal += user.saldo;
+        let saldo = 0;
+        try {
+            saldo = await consultarSaldo(user.id);
+        } catch (e) {
+            // Ignora erro caso FireFly esteja offline
+        }
+
+        if (saldo === 0) semSaldo++;
+        saldoTotal += saldo;
+        
         console.log(
             `  ${user.id.padEnd(4)}` +
             `${user.nome.padEnd(30)}` +
-            `${formatarMoeda(user.saldo)}` +
+            `${formatarMoeda(saldo)}` +
             `  ${user.email}`
         );
     }
@@ -64,11 +75,11 @@ function executarSeed(): void {
     console.log("  📋 Resumo:");
     console.log(`     • Alunos:    ${usuarios.filter(u => u.email.includes("@aluno")).length}`);
     console.log(`     • Outros:    ${usuarios.filter(u => !u.email.includes("@aluno")).length}`);
-    console.log(`     • Sem saldo: ${usuarios.filter(u => u.saldo === 0).length}`);
+    console.log(`     • Sem saldo: ${semSaldo}`);
     console.log();
     console.log("  🚀 Pronto para demonstração!");
     console.log(SEPARADOR);
     console.log();
 }
 
-executarSeed();
+executarSeed().catch(console.error);
