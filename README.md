@@ -14,7 +14,7 @@ O **UesPay** é uma plataforma digital baseada em blockchain desenvolvida para f
 - Atualização de saldo
 - Histórico de transações
 - Pagamento digital (refeição no RU via QR Code)
-- Transferência de valores entre usuários
+- Transferência de valores
 - Processamento de QR Code
 
 ---
