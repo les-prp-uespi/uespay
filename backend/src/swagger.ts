@@ -2,6 +2,9 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { Express } from 'express';
 
+const PORT = process.env.PORT || 3000;
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+
 const options = {
     definition: {
         openapi: '3.0.0',
@@ -12,8 +15,8 @@ const options = {
         },
         servers: [
             {
-                url: 'http://localhost:3000',
-                description: 'Servidor Local',
+                url: BASE_URL,
+                description: 'Servidor da API',
             },
         ],
     },
@@ -24,5 +27,5 @@ const swaggerSpec = swaggerJSDoc(options);
 
 export const setupSwagger = (app: Express) => {
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-    console.log('Documentação Swagger disponível em http://localhost:3000/api-docs');
+    console.log(`Documentação Swagger disponível em ${BASE_URL}/api-docs`);
 };
