@@ -10,6 +10,7 @@
 import "dotenv/config";
 import { resetarUsuarios, listarUsuarios } from "../data/users";
 import { consultarSaldo } from "../services/carteira.service";
+import { consultarSaldoRUBlockchain } from "../services/firefly.service";
 
 // ─── Constantes de formatação ──────────────────────────────────
 
@@ -71,6 +72,15 @@ async function executarSeed(): Promise<void> {
     console.log(LINHA);
     console.log(`  ${"TOTAL".padEnd(34)}${formatarMoeda(saldoTotal)}`);
     console.log(LINHA);
+    
+    let saldoRU = 0;
+    try {
+        saldoRU = await consultarSaldoRUBlockchain();
+    } catch(e) {}
+
+    console.log();
+    console.log("  🏢 Entidades (Recebimentos):");
+    console.log(`     • Restaurante Universitário: ${formatarMoeda(saldoRU)}`);
     console.log();
     console.log("  📋 Resumo:");
     console.log(`     • Alunos:    ${usuarios.filter(u => u.email.includes("@aluno")).length}`);

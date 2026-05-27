@@ -97,6 +97,30 @@ export async function consultarSaldoBlockchain(): Promise<number> {
 }
 
 /**
+ * Consulta o saldo do Restaurante Universitário (RU) na blockchain.
+ */
+export async function consultarSaldoRUBlockchain(): Promise<number> {
+    try {
+        const pools = await firefly.getTokenPools();
+        const poolId = pools.find(p => p.name === TOKEN_POOL)?.id;
+
+        if (!poolId) return 0;
+
+        const balances = await firefly.getTokenBalances({ pool: poolId });
+
+        if (!balances || balances.length === 0) return 0;
+
+        const saldoRU = balances.find((b) => b.key === ENDERECO_RU);
+
+        if (!saldoRU || !saldoRU.balance) return 0;
+
+        return desescalar(saldoRU.balance);
+    } catch (error) {
+        return 0;
+    }
+}
+
+/**
  * Emite (mint) novos tokens para representar uma recarga de créditos.
  * Representa a universidade emitindo créditos para o aluno.
  */
