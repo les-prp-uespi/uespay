@@ -12,5 +12,6 @@
     "types": [
       "node"
     ]
-  }
+  },
+  "exclude": ["vitest.config.ts"]
 }

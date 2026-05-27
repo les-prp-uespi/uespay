@@ -1,0 +1,154 @@
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { resetarUsuarios, buscarUsuarioPorId } from "../data/users";
+
+// Mock do firefly.service para não depender do FireFly rodando
+vi.mock("../services/firefly.service", () => ({
+    mintarTokens: vi.fn().mockResolvedValue(undefined),
+    transferirParaRU: vi.fn().mockResolvedValue(undefined),
+    registrarTransferencia: vi.fn().mockResolvedValue(undefined)
+}));
+
+import {
+    consultarSaldo,
+    adicionarSaldo,
+    debitarSaldo,
+    pagarRefeicao,
+    transferir,
+    getHistorico,
+    resetarTransacoes
+} from "../services/carteira.service";
+
+describe("Carteira Service", () => {
+    beforeEach(() => {
+        resetarUsuarios();
+        resetarTransacoes();
+    });
+
+    // ─── Consulta de Saldo ─────────────────────────────────────
+
+    describe("consultarSaldo", () => {
+        it("deve retornar saldo de usuário existente", () => {
+            const saldo = consultarSaldo("2");
+            expect(saldo).toBe(120.5);
+        });
+
+        it("deve lançar erro para usuário inexistente", () => {
+            expect(() => consultarSaldo("999")).toThrow("Usuário não encontrado");
+        });
+    });
+
+    // ─── Recarga (adicionarSaldo) ──────────────────────────────
+
+    describe("adicionarSaldo", () => {
+        it("deve incrementar o saldo do usuário", async () => {
+            const resultado = await adicionarSaldo("1", 50);
+
+            expect(resultado.mensagem).toContain("sucesso");
+            expect(resultado.saldoRestante).toBe(50);
+        });
+
+        it("deve rejeitar valor zero ou negativo", async () => {
+            await expect(adicionarSaldo("1", 0)).rejects.toThrow("positivo");
+            await expect(adicionarSaldo("1", -10)).rejects.toThrow("positivo");
+        });
+
+        it("deve registrar no histórico", async () => {
+            await adicionarSaldo("1", 100);
+            const historico = getHistorico("1");
+
+            expect(historico).toHaveLength(1);
+            expect(historico[0].tipo).toBe("RECARGA");
+            expect(historico[0].valor).toBe(100);
+        });
+    });
+
+    // ─── Débito (debitarSaldo) ─────────────────────────────────
+
+    describe("debitarSaldo", () => {
+        it("deve decrementar o saldo do usuário", async () => {
+            // Primeiro adiciona saldo para poder debitar
+            await adicionarSaldo("1", 100);
+            const resultado = await debitarSaldo("1", 30);
+
+            expect(resultado.saldoRestante).toBe(70);
+        });
+
+        it("deve rejeitar quando saldo insuficiente", async () => {
+            await expect(debitarSaldo("1", 50)).rejects.toThrow("Saldo insuficiente");
+        });
+
+        it("deve rejeitar valor negativo", async () => {
+            await expect(debitarSaldo("1", -5)).rejects.toThrow("positivo");
+        });
+    });
+
+    // ─── Pagamento de Refeição ─────────────────────────────────
+
+    describe("pagarRefeicao", () => {
+        it("deve processar pagamento com senha correta", async () => {
+            await adicionarSaldo("1", 100);
+            const resultado = await pagarRefeicao("1", 15, "1234");
+
+            expect(resultado.mensagem).toContain("sucesso");
+            expect(resultado.saldoRestante).toBe(85);
+        });
+
+        it("deve rejeitar senha incorreta", async () => {
+            await adicionarSaldo("1", 100);
+            await expect(pagarRefeicao("1", 15, "errada")).rejects.toThrow("Senha inválida");
+        });
+
+        it("deve rejeitar quando saldo insuficiente", async () => {
+            await expect(pagarRefeicao("1", 50, "1234")).rejects.toThrow("Saldo insuficiente");
+        });
+
+        it("deve registrar no histórico como REFEICAO", async () => {
+            await adicionarSaldo("1", 100);
+            await pagarRefeicao("1", 15, "1234");
+
+            const historico = getHistorico("1");
+            const refeicao = historico.find(t => t.tipo === "REFEICAO");
+
+            expect(refeicao).toBeDefined();
+            expect(refeicao!.valor).toBe(15);
+        });
+    });
+
+    // ─── Transferência P2P ─────────────────────────────────────
+
+    describe("transferir", () => {
+        it("deve debitar remetente e creditar destinatário", async () => {
+            await adicionarSaldo("1", 100);
+            const resultado = await transferir("1", "2", 40, "1234");
+
+            expect(resultado.saldoRestante).toBe(60);
+
+            const saldoDestinatario = consultarSaldo("2");
+            expect(saldoDestinatario).toBe(160.5); // 120.5 + 40
+        });
+
+        it("deve rejeitar senha incorreta", async () => {
+            await adicionarSaldo("1", 100);
+            await expect(transferir("1", "2", 40, "errada")).rejects.toThrow("Senha inválida");
+        });
+
+        it("deve rejeitar quando saldo insuficiente", async () => {
+            await expect(transferir("1", "2", 50, "1234")).rejects.toThrow("Saldo insuficiente");
+        });
+
+        it("deve registrar no histórico de ambos os usuários", async () => {
+            await adicionarSaldo("1", 100);
+            await transferir("1", "2", 40, "1234");
+
+            const historicoRemetente = getHistorico("1");
+            const historicoDestinatario = getHistorico("2");
+
+            const transferencia1 = historicoRemetente.find(t => t.tipo === "TRANSFERENCIA");
+            const transferencia2 = historicoDestinatario.find(t => t.tipo === "TRANSFERENCIA");
+
+            expect(transferencia1).toBeDefined();
+            expect(transferencia2).toBeDefined();
+            expect(transferencia1!.id).toBe(transferencia2!.id);
+        });
+    });
+});
