@@ -1,4 +1,4 @@
-import { users } from "../data/users";
+import { buscarUsuarioPorId } from "../data/users";
 import { mintarTokens, transferirParaRU, registrarTransferencia } from "./firefly.service";
 import type { Transacao, RespostaTransacao } from "../types";
 
@@ -10,7 +10,7 @@ const transacoes: Transacao[] = [];
  * Lança erro se não encontrado.
  */
 function buscarUsuario(userId: string) {
-    const user = users.find((u) => u.id === userId);
+    const user = buscarUsuarioPorId(userId);
     if (!user) throw new Error("Usuário não encontrado");
     return user;
 }
