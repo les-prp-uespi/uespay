@@ -15,7 +15,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
       home: const MyHomePage(title: 'Uespay'),
     );
   }
@@ -26,31 +25,44 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePage> createState() => MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePageState extends State<MyHomePage> {
   Color corDoBotao = Colors.blue;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 5, 42, 166),
-        title: 
-        Center(
+        title: Center(
           child: Row(
             children: [
-              Padding(padding: EdgeInsetsGeometry.symmetric(vertical: 1, horizontal: 10),
-         child:Image.asset('lib/assets/images/logo_uespi.png', height: 40,),
+              Padding(
+                padding: EdgeInsetsGeometry.symmetric(
+                  vertical: 1,
+                  horizontal: 10,
+                ),
+                child: Image.asset(
+                  'lib/assets/images/logo_uespi.png',
+                  height: 40,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsetsGeometry.symmetric(
+                  vertical: 1,
+                  horizontal: 100,
+                ),
+                child: Text(
+                  widget.title,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ], // centerTitle: true,
           ),
-Padding(padding: EdgeInsetsGeometry.symmetric(vertical: 1, horizontal: 300),
-         child: Text(
-          widget.title,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ), 
-),
-             ], // centerTitle: true,
-      ),
         ),
       ),
       body: Center(
@@ -75,21 +87,15 @@ Padding(padding: EdgeInsetsGeometry.symmetric(vertical: 1, horizontal: 300),
               ),
             ),
             Expanded(
-              flex: 1,
-              child: Container(
-               
-                height: 90,
-                width: 500,
-                margin: EdgeInsets.only(
-                  top: 40,
-                  bottom: 30,
-                  left: 130,
-                  right: 130,
-                ),
-                padding: EdgeInsets.only(top: 370, bottom: 50),
-                color: Color(0xFF2A2D39),
-              ),
-            ),
+               flex: 1,
+               child: Container(
+                margin: EdgeInsets.symmetric(vertical: 25, horizontal: 10),
+                 height: 90,
+                 width: 500,
+               padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                 color: Color(0xFF2A2D39),
+                 child:PagamentoScannerPage()               ),
+             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF1047E0),
@@ -117,8 +123,8 @@ Padding(padding: EdgeInsetsGeometry.symmetric(vertical: 1, horizontal: 300),
   }
 }
 
-
 class PagamentoScannerPage extends StatefulWidget {
+  const PagamentoScannerPage({super.key});
   @override
   PagamentoScannerPageState createState() => PagamentoScannerPageState();
 }
@@ -130,7 +136,6 @@ class PagamentoScannerPageState extends State<PagamentoScannerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Escaneie o QR Code')),
       body: Stack(
         children: [
           MobileScanner(
@@ -147,7 +152,7 @@ class PagamentoScannerPageState extends State<PagamentoScannerPage> {
                   setState(() {
                     _processandoPagamento = true;
                   });
-                  
+
                   // Pausa a câmera para não ler o mesmo código várias vezes
                   await controller.stop();
 
@@ -158,9 +163,7 @@ class PagamentoScannerPageState extends State<PagamentoScannerPage> {
             },
           ),
           if (_processandoPagamento)
-            const Center(
-              child: CircularProgressIndicator(),
-            ),
+            const Center(child: CircularProgressIndicator()),
         ],
       ),
     );
@@ -172,13 +175,10 @@ class PagamentoScannerPageState extends State<PagamentoScannerPage> {
 
       if (pagamentoSucesso) {
         // Pagamento feito com sucesso! Prossiga para próxima tela
-      Navigator.push(
-                          (context),
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const TelaSucessoPag(),
-                          ),
-                        );
+        Navigator.push(
+          (context),
+          MaterialPageRoute(builder: (context) => const TelaSucessoPag()),
+        );
       } else {
         // Pagamento falhou
         _mostrarErro('Pagamento recusado ou não concluído.');
