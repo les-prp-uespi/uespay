@@ -178,6 +178,11 @@ uespay/
 
 ---
 
+## Arquitetura da Solução
+<p align="center">
+  <img src=".img/arquitetura.png" alt="Arquitetura da Solução">
+</p>
+
 ## Equipe
 
 - Maria Rita Lustosa da Silva Nascimento
