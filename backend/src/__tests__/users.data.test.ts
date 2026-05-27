@@ -13,18 +13,17 @@ describe("Data Layer — Usuários", () => {
     });
 
     describe("listarUsuarios", () => {
-        it("deve retornar 10 usuários iniciais", () => {
+        it("deve retornar 1 usuário inicial", () => {
             const usuarios = listarUsuarios();
-            expect(usuarios).toHaveLength(10);
+            expect(usuarios).toHaveLength(1);
         });
 
-        it("todos os usuários devem ter id, nome, email e saldo", () => {
+        it("todos os usuários devem ter id, nome, email", () => {
             const usuarios = listarUsuarios();
             for (const user of usuarios) {
                 expect(user.id).toBeDefined();
                 expect(user.nome).toBeDefined();
                 expect(user.email).toBeDefined();
-                expect(typeof user.saldo).toBe("number");
             }
         });
     });
@@ -60,20 +59,18 @@ describe("Data Layer — Usuários", () => {
             const novo = adicionarUsuario({
                 nome: "Teste Silva",
                 email: "teste@aluno.uespi.br",
-                saldo: 0,
                 senha: "1234"
             });
 
-            expect(novo.id).toBe("11");
+            expect(novo.id).toBe("2");
             expect(novo.nome).toBe("Teste Silva");
-            expect(listarUsuarios()).toHaveLength(11);
+            expect(listarUsuarios()).toHaveLength(2);
         });
 
         it("novo usuário deve ser encontrável por ID", () => {
             const novo = adicionarUsuario({
                 nome: "Novo Aluno",
                 email: "novo@aluno.uespi.br",
-                saldo: 50,
                 senha: "abcd"
             });
 
@@ -88,25 +85,24 @@ describe("Data Layer — Usuários", () => {
             adicionarUsuario({
                 nome: "Extra",
                 email: "extra@uespi.br",
-                saldo: 0,
                 senha: "1234"
             });
 
-            expect(listarUsuarios()).toHaveLength(11);
+            expect(listarUsuarios()).toHaveLength(2);
 
             resetarUsuarios();
 
-            expect(listarUsuarios()).toHaveLength(10);
+            expect(listarUsuarios()).toHaveLength(1);
         });
 
-        it("deve restaurar saldos originais", () => {
+        it("deve restaurar nome original", () => {
             const user = buscarUsuarioPorId("1")!;
-            user.saldo = 999;
+            user.nome = "Modificado";
 
             resetarUsuarios();
 
             const restaurado = buscarUsuarioPorId("1")!;
-            expect(restaurado.saldo).toBe(0);
+            expect(restaurado.nome).toBe("Ana Carolina Sousa");
         });
     });
 });

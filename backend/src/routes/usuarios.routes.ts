@@ -21,7 +21,7 @@ const router = Router();
  * Remove o campo `senha` antes de enviar ao cliente.
  * Evita expor dados sensíveis nas respostas da API.
  */
-function sanitizarUsuario(user: { id: string; nome: string; email: string; saldo: number; senha: string }) {
+function sanitizarUsuario(user: { id: string; nome: string; email: string; senha: string }) {
     const { senha: _, ...usuarioSemSenha } = user;
     return usuarioSemSenha;
 }
@@ -99,7 +99,6 @@ router.post("/", (req: Request, res: Response) => {
     const novoUsuario = adicionarUsuario({
         nome: nomeTrimmed,
         email: email.trim().toLowerCase(),
-        saldo: 0,
         senha
     });
 
