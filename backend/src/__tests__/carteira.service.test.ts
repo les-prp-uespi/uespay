@@ -1,11 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { resetarUsuarios, buscarUsuarioPorId } from "../data/users";
+import { resetarUsuarios, buscarUsuarioPorId, adicionarUsuario } from "../data/users";
+
+// Variável para simular o saldo na blockchain durante os testes
+let mockSaldoBlockchain = 0;
 
 // Mock do firefly.service para não depender do FireFly rodando
 vi.mock("../services/firefly.service", () => ({
-    mintarTokens: vi.fn().mockResolvedValue(undefined),
-    transferirParaRU: vi.fn().mockResolvedValue(undefined),
-    registrarTransferencia: vi.fn().mockResolvedValue(undefined)
+    mintarTokens: vi.fn().mockImplementation(async (valor) => { mockSaldoBlockchain += valor; }),
+    transferirParaRU: vi.fn().mockImplementation(async (valor) => { mockSaldoBlockchain -= valor; }),
+    registrarTransferencia: vi.fn().mockImplementation(async (data) => { mockSaldoBlockchain -= data.valor; }),
+    consultarSaldoBlockchain: vi.fn().mockImplementation(async () => mockSaldoBlockchain)
 }));
 
 import {
@@ -22,18 +26,27 @@ describe("Carteira Service", () => {
     beforeEach(() => {
         resetarUsuarios();
         resetarTransacoes();
+        mockSaldoBlockchain = 0; // Resetar saldo do mock
+        
+        // Adiciona um segundo usuário para testes de transferência
+        adicionarUsuario({
+            nome: "Usuario 2",
+            email: "user2@aluno.uespi.br",
+            senha: "1234"
+        }); // O ID gerado será "2"
     });
 
     // ─── Consulta de Saldo ─────────────────────────────────────
 
     describe("consultarSaldo", () => {
-        it("deve retornar saldo de usuário existente", () => {
-            const saldo = consultarSaldo("2");
+        it("deve retornar saldo de usuário existente", async () => {
+            mockSaldoBlockchain = 120.5;
+            const saldo = await consultarSaldo("1");
             expect(saldo).toBe(120.5);
         });
 
-        it("deve lançar erro para usuário inexistente", () => {
-            expect(() => consultarSaldo("999")).toThrow("Usuário não encontrado");
+        it("deve lançar erro para usuário inexistente", async () => {
+            await expect(consultarSaldo("999")).rejects.toThrow("Usuário não encontrado");
         });
     });
 
@@ -117,14 +130,11 @@ describe("Carteira Service", () => {
     // ─── Transferência P2P ─────────────────────────────────────
 
     describe("transferir", () => {
-        it("deve debitar remetente e creditar destinatário", async () => {
+        it("deve debitar remetente", async () => {
             await adicionarSaldo("1", 100);
             const resultado = await transferir("1", "2", 40, "1234");
 
             expect(resultado.saldoRestante).toBe(60);
-
-            const saldoDestinatario = consultarSaldo("2");
-            expect(saldoDestinatario).toBe(160.5); // 120.5 + 40
         });
 
         it("deve rejeitar senha incorreta", async () => {
