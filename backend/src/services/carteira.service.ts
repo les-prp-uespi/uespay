@@ -33,9 +33,19 @@ function buscarUsuario(userId: string) {
 export function getHistorico(userId: string): Transacao[] {
     buscarUsuario(userId);
 
-    return transacoes.filter(t =>
+    const filtradas = transacoes.filter(t =>
         t.fromUserId === userId || t.toUserId === userId
     );
+
+    return filtradas.map(t => {
+        const fromUser = buscarUsuarioPorId(t.fromUserId);
+        const toUser = t.toUserId ? buscarUsuarioPorId(t.toUserId) : undefined;
+        return {
+            ...t,
+            fromUserEmail: fromUser?.email,
+            toUserEmail: toUser?.email
+        };
+    });
 }
 
 /**

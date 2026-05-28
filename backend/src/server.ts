@@ -24,7 +24,7 @@ app.use("/api/transacoes", transacoesRoutes);
 // Middleware de erro global (deve ficar APÓS todas as rotas)
 app.use(errorHandler);
 
-app.listen(PORT, async () => {
+app.listen(Number(PORT), "0.0.0.0", async () => {
     console.log(`Servidor rodando na porta ${PORT}`);
     await inicializarTokenPool();
 });

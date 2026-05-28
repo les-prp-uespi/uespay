@@ -28,7 +28,7 @@ class _TelaHistoricoTransferState extends State<TelaHistoricoTransfer> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:3000/api/transacoes/1/historico'),
+        Uri.parse('http://10.0.2.2:3000/api/transacoes/1/historico'),
       );
 
       if (response.statusCode == 200) {
@@ -105,10 +105,10 @@ class _TelaHistoricoTransferState extends State<TelaHistoricoTransfer> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (t['fromUserId'] != null)
-                          Text('De: ${t['fromUserId']}'),
+                       if (t['fromUserId'] != null)
+                          Text('De: ${t['fromUserEmail'] ?? t['fromUserId']}'),
                         if (t['toUserId'] != null)
-                          Text('Para: ${t['toUserId']}'),
+                          Text('Para: ${t['toUserEmail'] ?? t['toUserId']}'),
                         Text(formatarData(data)),
                       ],
                     ),

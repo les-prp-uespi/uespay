@@ -1,56 +1,66 @@
 import 'package:flutter/material.dart';
 
 class TelaSucessoPag extends StatelessWidget {
-  const TelaSucessoPag({super.key});
+  final double valor;
+  const TelaSucessoPag({super.key, required this.valor});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 227, 228, 232),
-           leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 227, 228, 232),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // Volta para a página anterior
+            // Volta para a página anterior (home)
+            Navigator.pop(context); 
           },
         ),
-        ),
-        body: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(padding: EdgeInsets.symmetric(vertical: 30),
-               child: Text('Pagamento realizado com sucesso!', style: TextStyle(fontSize: 30),),),
-
-               Padding(padding: EdgeInsets.symmetric(vertical: 200),
-             child: CircleAvatar(
-  radius: 60.0, // Tamanho do círculo
-  backgroundColor: Colors.green,
-  child: Icon(
-    Icons.check,
-    color: Colors.white,
-    size: 70.0, // Tamanho do ícone de check
-  ),),
+      ),
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 30),
+                child: Text(
+                  'Pagamento realizado com sucesso!', 
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 80),
+                child: CircleAvatar(
+                  radius: 60.0,
+                  backgroundColor: Colors.green,
+                  child: Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 70.0,
+                  ),
+                ),
               ),
               SizedBox(
                 height: 70,
                 width: 300,
-              child: Card(
-                child:Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                Text('Você enviou tantos reais!'),
-                  ],
+                child: Card(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Você enviou R\$ ${valor.toStringAsFixed(2)}!',
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-                )
-              )
-                ],
-                ),)
+            ],
           ),
         ),
-      );
-  
+      ),
+    );
   }
 }

@@ -14,7 +14,6 @@ const ESCALA = BigInt("1000000000000000000"); // 10^18
 
 /**
  * Endereço do Restaurante Universitário (RU) na blockchain.
- * Em produção, o RU seria um membro FireFly separado.
  */
 const ENDERECO_RU = "0x0000000000000000000000000000000000000001";
 
